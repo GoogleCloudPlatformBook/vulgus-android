@@ -1,5 +1,6 @@
 package ugia.vulgus.app;
 
+import android.app.AlertDialog;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ public class MainActivity extends FragmentActivity implements
 
     private final static int DEFAULT_ZOOM = 12;
 
-    private static final long INTERVAL_ONE_MINUTE = 60000;
+    private static final long INTERVAL_TEN_SECONDS = 10000;
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -46,12 +47,6 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         if (mLocationClient.isConnected()) {
@@ -61,15 +56,26 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void initialize() {
+        setUpMap();
+        setUpLocationHandler();
+    }
 
-        setUpMapIfNeeded();
+    private void setUpMap() {
+
+        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        if (mMap != null) {
+            mMap.getUiSettings().setZoomControlsEnabled(false);
+        }
+    }
+
+    private void setUpLocationHandler() {
 
         mLocationClient = new LocationClient(this, this, this);
 
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-        mLocationRequest.setInterval(INTERVAL_ONE_MINUTE);
-        mLocationRequest.setFastestInterval(INTERVAL_ONE_MINUTE);
+        mLocationRequest.setInterval(INTERVAL_TEN_SECONDS);
+        mLocationRequest.setFastestInterval(INTERVAL_TEN_SECONDS);
     }
 
     /*
@@ -89,9 +95,7 @@ public class MainActivity extends FragmentActivity implements
      */
     @Override
     public void onDisconnected() {
-        // Display the connection status
-        Toast.makeText(this, "Disconnected. Please re-connect.",
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
     }
 
     /*
@@ -131,45 +135,13 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        moveMapToLocation(location);
-    }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
-        }
-    }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("New location: " + location.toString());
+        builder.create().show();
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-    private void setUpMap() {
-        mMap.getUiSettings().setZoomControlsEnabled(false);
+        // Send location
+        // Fetch new polygons
     }
 
     private void moveMapToLocation(Location location) {
