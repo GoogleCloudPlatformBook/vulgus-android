@@ -115,7 +115,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    /*
+    /**
      * Called by Location Services when the request to connect the
      * client finishes successfully. At this point, you can
      * request the current location or start periodic updates
@@ -125,7 +125,7 @@ public class MainActivity extends FragmentActivity implements
         refreshState();
     }
 
-    /*
+    /**
      * Called by Location Services if the connection to the
      * location client drops because of an error.
      */
@@ -134,7 +134,7 @@ public class MainActivity extends FragmentActivity implements
         Toast.makeText(this, "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
     }
 
-    /*
+    /**
      * Called by Location Services if the attempt to
      * Location Services fails.
      */
@@ -190,6 +190,11 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Pushes the current location of the user with the corresponding anonynomous instance id
+     *
+     * @param location The location to send to our api.
+     */
     private void pushUserLocation(final Location location) {
 
         new Thread(new Runnable() {
@@ -206,6 +211,12 @@ public class MainActivity extends FragmentActivity implements
         }).start();
     }
 
+    /**
+     * Retrieves the surrounding location information for a given position in the map,
+     * supposed to be the current user location.
+     *
+     * @param location The current location of the user.
+     */
     private void fetchSurroundingData(final Location location) {
 
         setRefreshingMap(true);
@@ -237,6 +248,9 @@ public class MainActivity extends FragmentActivity implements
         }).start();
     }
 
+    /**
+     * Generates a random set of points for debugging purposes.
+     */
     private void generateRandomSurroundingData() {
         drawLocations(LocationPoints.generateRandomMap(52.511f, 52.537f, 13.393f, 13.442f, 80));
     }
@@ -262,6 +276,12 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Retrieves or creates a unique and anonymous instance id to avoid location duplicates for the same user on
+     * the server side. This instance id is stored on shared preferences for further re-use.
+     *
+     * @return the generated/stored instance id as a string
+     */
     private String getInstanceId() {
 
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);

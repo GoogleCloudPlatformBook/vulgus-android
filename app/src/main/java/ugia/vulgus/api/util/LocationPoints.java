@@ -33,6 +33,13 @@ public class LocationPoints {
     private static final float ROUGH_TWO_HUNDRED_M_DEGREES_MODULE = 0.002f;
     private static final float ROUGH_TWO_KM_DEGREES_MODULE = 0.02f;
 
+    /**
+     * Processes an array location points to generate heat polygons for them to be drawn into the map. There are
+     * a couple of basic spatial analysis algorithms applied here.
+     *
+     * @param locationPoints Array of points to be processed
+     * @return {@link List} of polygons.
+     */
     public static List<PolygonOptions> asMapPolygonOptionsList(ClassifiedLatLng[] locationPoints) {
 
         groupByDistance(locationPoints);
@@ -125,15 +132,34 @@ public class LocationPoints {
         return polygonOptionsList;
     }
 
+    /**
+     * Calculates a vector from to given points
+     *
+     * @param pointA Origin point
+     * @param pointB Vector point
+     * @return a vector encapsulated within a {@link com.google.android.gms.maps.model.LatLng}.
+     */
     private static LatLng vectorForPoints(LatLng pointA, LatLng pointB) {
         return new LatLng(pointB.latitude - pointA.latitude, pointB.longitude - pointA.longitude);
     }
 
+    /**
+     * Returns the angle between the two given vectors
+     *
+     * @param vectorA Reference vector
+     * @param vectorB Comparison vector
+     * @return The angle in degrees ranging from -180 to 180.
+     */
     private static double angleForVectors(LatLng vectorA, LatLng vectorB) {
         return Math.toDegrees(Math.atan2(vectorB.latitude, vectorB.longitude) -
                 Math.atan2(vectorA.latitude, vectorA.longitude));
     }
 
+    /**
+     * Classifies a list of {@link ugia.vulgus.api.data.object.ClassifiedLatLng} based on their proximity
+     *
+     * @param locationPoints Points to process
+     */
     public static void groupByDistance(ClassifiedLatLng[] locationPoints) {
 
         int size = locationPoints.length;
@@ -160,6 +186,13 @@ public class LocationPoints {
         }
     }
 
+    /**
+     * Returns the top most northern point of a {@link java.util.List} of {@link ugia.vulgus.api.data.object
+     * .ClassifiedLatLng}
+     *
+     * @param locationPoints List of points
+     * @return The top most northern point in the list
+     */
     private static ClassifiedLatLng getTopNorthPoint(List<ClassifiedLatLng> locationPoints) {
 
         double topLatitude = EARTH_MIN_LATITUDE;
@@ -178,6 +211,12 @@ public class LocationPoints {
         return topNorthPoint;
     }
 
+    /**
+     * Removes all points in the list contained within the given polygon
+     *
+     * @param points  {@link java.util.List} of points
+     * @param polygon Given polygon
+     */
     private static void removePointsWithinPolygon(List<ClassifiedLatLng> points, List<LatLng> polygon) {
 
         Iterator<ClassifiedLatLng> iterator = points.iterator();
@@ -188,6 +227,14 @@ public class LocationPoints {
         }
     }
 
+    /**
+     * Checks if the specified point lies within the boundaries of a given polyon. Code credit by <a
+     * href="http://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/">@geeksforgeeks</a>
+     *
+     * @param polygon Given polygon
+     * @param p       Point to evaluate
+     * @return To be or not to be
+     */
     private static boolean isPointInsidePolygon(List<LatLng> polygon, LatLng p) {
 
         int verticesCount = polygon.size();
@@ -300,6 +347,16 @@ public class LocationPoints {
         }
     }
 
+    /**
+     * Generates a set of random points enclosed by location box
+     *
+     * @param latMin Minimum latitude
+     * @param latMax Maximum latitude
+     * @param lonMin Minimum longited
+     * @param lonMax Maximum longitude
+     * @param n      Number of points to generate
+     * @return An array of classified points based on the given parameters
+     */
     public static ClassifiedLatLng[] generateRandomMap(float latMin, float latMax, float lonMin, float lonMax,
                                                        int n) {
 
