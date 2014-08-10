@@ -172,8 +172,8 @@ public class MainActivity extends FragmentActivity implements
         Location location = mLocationClient.getLastLocation();
 
         moveMapToLocation(location);
-        generateRandomSurroundingData();
-        //fetchSurroundingData(location);
+        fetchSurroundingData(location);
+        //generateRandomSurroundingData(); Generates random points within a given area for debugging purposes
 
         pushUserLocation(location);
     }
